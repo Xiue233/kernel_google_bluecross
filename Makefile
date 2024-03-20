@@ -3,7 +3,6 @@ PATCHLEVEL = 9
 SUBLEVEL = 337
 EXTRAVERSION = _xiue_
 NAME = Roaring Lionus
-LLVM = ""
 
 # *DOCUMENTATION*
 # To see a list of typical targets execute "make help"
