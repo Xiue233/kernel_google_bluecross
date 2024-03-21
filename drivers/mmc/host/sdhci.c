@@ -158,6 +158,26 @@ static void sdhci_dumpregs(struct sdhci_host *host)
 	pr_info(DRIVER_NAME ": ===========================================\n");
 }
 
+static bool sdhci_timing_has_preset(unsigned char timing)
+{
+        switch (timing) {
+        case MMC_TIMING_UHS_SDR12:
+        case MMC_TIMING_UHS_SDR25:
+        case MMC_TIMING_UHS_SDR50:
+        case MMC_TIMING_UHS_SDR104:
+        case MMC_TIMING_UHS_DDR50:
+        case MMC_TIMING_MMC_DDR52:
+                return true;
+        }
+        return false;
+}
+
+static bool sdhci_preset_needed(struct sdhci_host *host, unsigned char timing)
+{
+        return !(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN) &&
+               sdhci_timing_has_preset(timing);
+}
+
 /*****************************************************************************\
  *                                                                           *
  * Low level functions                                                       *
@@ -2167,7 +2187,7 @@ static void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		}
 	} else
 		sdhci_writeb(host, ctrl, SDHCI_HOST_CONTROL);
-
+out:
 	spin_unlock_irqrestore(&host->lock, flags);
 	/*
 	 * Some (ENE) controllers go apeshit on some ios operation,
